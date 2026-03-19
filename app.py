@@ -1,34 +1,34 @@
 import streamlit as st
+import PyPDF2
 
-st.title("🤖 My AI Chatbot (Free Version)")
+st.title("📄 Resume Analyzer")
 
-# create memory
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+uploaded_file = st.file_uploader("Upload your resume (PDF)", type=["pdf"])
 
-# show previous messages
-for msg in st.session_state.messages:
-    st.write(msg)
+if uploaded_file:
+    st.success("File uploaded successfully ✅")
 
-# user input
-user_input = st.text_input("Ask something:")
+    # read PDF
+    pdf_reader = PyPDF2.PdfReader(uploaded_file)
+    text = ""
 
-if user_input:
-    # store user message
-    st.session_state.messages.append("You: " + user_input)
+    for page in pdf_reader.pages:
+        text += page.extract_text()
 
-    # simple replies
-    if "hello" in user_input.lower():
-        reply = "Hi! How can I help you? 😊"
-    elif "python" in user_input.lower():
-        reply = "Python is a programming language used for AI and development."
-    elif "ai" in user_input.lower():
-        reply = "AI means Artificial Intelligence 🤖"
+    st.write("### Extracted Text")
+    st.write(text)
+
+    # simple analysis
+    st.write("### Analysis Result")
+
+    if "python" in text.lower():
+        st.write("✅ Python skill detected")
     else:
-        reply = "I'm still learning 😅 please ask something simple."
+        st.write("❌ Python skill not found")
 
-    # store bot reply
-    st.session_state.messages.append("Bot: " + reply)
+    if "project" in text.lower():
+        st.write("✅ Projects mentioned")
+    else:
+        st.write("❌ Add projects to your resume")
 
-    # show reply
-    st.write("Bot:", reply)
+    st.write("⚡ Basic Score: 7/10")
