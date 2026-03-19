@@ -1,23 +1,31 @@
 import streamlit as st
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
+st.title("🤖 My AI Chatbot (Free Version)")
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-st.title("🤖 My AI Chatbot")
+# display messages
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
 
-user_input = st.text_input("Ask something:")
+# input
+user_input = st.chat_input("Ask something...")
 
 if user_input:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "user", "content": user_input}
-        ]
-    )
-    
-    answer = response.choices[0].message.content
-    st.write("AI:", answer)
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    st.chat_message("user").write(user_input)
+
+    # simple rule-based replies
+    if "hello" in user_input.lower():
+        answer = "Hi! How can I help you? 😊"
+    elif "python" in user_input.lower():
+        answer = "Python is a popular programming language used for AI and development."
+    elif "ai" in user_input.lower():
+        answer = "AI means Artificial Intelligence — machines that can think and learn."
+    else:
+        answer = "I'm still learning 😅 please ask something simple."
+
+    st.session_state.messages.append({"role": "assistant", "content": answer})
+    st.chat_message("assistant").write(answer)
